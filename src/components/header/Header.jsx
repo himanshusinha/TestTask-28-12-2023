@@ -1,4 +1,4 @@
-import {View, Text, Image, TouchableOpacity} from 'react-native';
+import {View, Text, Image, TouchableOpacity, Platform} from 'react-native';
 import React from 'react';
 import {moderateScale, textScale} from '../../styles/responsiveSize';
 import colors from '../../constants/colors';
@@ -19,8 +19,9 @@ const Header = ({
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          marginStart: moderateScale(26),
-          marginTop: moderateScale(50),
+          marginStart: moderateScale(15),
+          marginTop:
+            Platform.OS === 'ios' ? moderateScale(55) : moderateScale(20),
         }}>
         <Image
           source={iconCountryFlag}
@@ -48,7 +49,9 @@ const Header = ({
       <TouchableOpacity
         style={{
           flexDirection: 'row',
-          marginTop: moderateScale(40),
+          marginTop:
+            Platform.OS === 'ios' ? moderateScale(50) : moderateScale(10),
+
           marginEnd: moderateScale(10),
           borderWidth: 1,
           borderColor: colors.WHITE,
@@ -57,6 +60,8 @@ const Header = ({
           borderRadius: moderateScale(20),
           justifyContent: 'center',
           alignItems: 'center',
+          marginTop:
+            Platform.OS === 'ios' ? moderateScale(50) : moderateScale(10),
         }}>
         <Image
           source={iconGift}
@@ -78,7 +83,8 @@ const Header = ({
           style={{
             width: moderateScale(25),
             height: moderateScale(25),
-            marginTop: moderateScale(50),
+            marginTop:
+              Platform.OS === 'ios' ? moderateScale(60) : moderateScale(20),
             marginEnd: moderateScale(13),
             alignSelf: 'center',
           }}

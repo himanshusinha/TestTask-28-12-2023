@@ -6,6 +6,7 @@ import {
   FlatList,
   Dimensions,
   Image,
+  Platform,
 } from 'react-native';
 import React, {useRef, useEffect, useState} from 'react';
 import colors from '../../../../constants/colors';
@@ -48,7 +49,8 @@ const HomeScreen = () => {
     <View style={{flex: 1, backgroundColor: colors.WHITE}}>
       <View
         style={{
-          height: moderateScale(120),
+          height:
+            Platform.OS === 'ios' ? moderateScale(120) : moderateScale(80),
           backgroundColor: colors.NAVY_BLUE,
           justifyContent: 'center',
         }}>
