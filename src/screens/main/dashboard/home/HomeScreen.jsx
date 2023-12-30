@@ -34,7 +34,12 @@ const HomeScreen = () => {
   const flatListRef = useRef(null);
   const autoplayInterval = 3000;
   const [data, setData] = useState(bannerData);
+  const apiUrl = 'https://api.injazrent.ae/user/getAllCars';
+  const [categoriesData, setCategoriesData] = useState([]);
+  const [carsData, setCarsData] = useState([]);
+  const [filteredCars, setFilteredCars] = useState('');
 
+  console.log(categoriesData, '......categoriesDAta');
   useEffect(() => {
     const autoplayTimer = setInterval(() => {
       const nextIndex = (currentIndex + 1) % data.length;
@@ -44,7 +49,45 @@ const HomeScreen = () => {
     }, autoplayInterval);
 
     return () => clearInterval(autoplayTimer);
-  }, [currentIndex, data]);
+  }, [currentIndex]);
+  useEffect(() => {
+    fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(apiResponse => {
+        if (
+          apiResponse &&
+          Array.isArray(apiResponse.data) &&
+          apiResponse.data.length > 0
+        ) {
+          setCarsData(apiResponse.data);
+          setFilteredCars(apiResponse.data);
+
+          const categories = apiResponse.data
+            .map(car => car.category)
+            .filter((value, index, self) => self.indexOf(value) === index);
+          setCategoriesData(categories);
+        } else {
+          console.log('No car data found in the API response.');
+        }
+      })
+      .catch(error => {
+        Toast.show({
+          type: 'error',
+          text1: error.message,
+          topOffset: moderateScale(90),
+        });
+      });
+  }, []);
+  const handleCategoryPress = category => {
+    const filtered = carsData.filter(car => car.category === category);
+    setFilteredCars(filtered);
+  };
+
   return (
     <View style={{flex: 1, backgroundColor: colors.WHITE}}>
       <View
@@ -172,8 +215,10 @@ const HomeScreen = () => {
             contentContainerStyle={{justifyContent: 'space-between'}}
             data={categoriesData}
             renderItem={({item}) => {
+              console.log(item, '.........popular cars');
               return (
                 <TouchableOpacity
+                  onPress={() => handleCategoryPress(item)}
                   activeOpacity={0.8}
                   style={{
                     flexDirection: 'row',
@@ -183,24 +228,34 @@ const HomeScreen = () => {
                   <View
                     style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Image
-                      style={{
-                        width: moderateScale(60),
-                        height: moderateScale(60),
+                      resizeMode="contain"
+                      source={{
+                        uri:
+                          Array.isArray(item.image) && item.image.length > 0
+                            ? item.image[0]
+                            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-_Q04if8V8D3_si9dRkfhuqXAOooal8mYXg&usqp=CAU', // Fallback to local image if no image from API
                       }}
-                      source={item?.image}
+                      style={{
+                        width: moderateScale(100),
+                        height: moderateScale(100),
+                      }}
+                      onError={e =>
+                        console.log('Error loading image:', e.nativeEvent.error)
+                      }
                     />
                     <Text
                       style={{
                         fontSize: textScale(10),
                         fontFamily: fontFamily.POPPINS_SEMI_BOLD,
                       }}>
-                      {item.category}
+                      {item ? item : 'no category'}
                     </Text>
                   </View>
                 </TouchableOpacity>
               );
             }}
           />
+
           <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -291,23 +346,81 @@ const HomeScreen = () => {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={popularCarData}
+            data={filteredCars}
             renderItem={({item}) => {
               return (
                 <View
                   style={{
-                    width: moderateScale(180),
+                    width: moderateScale(240),
                     height: moderateScale(300),
                     backgroundColor: colors.NAVY_BLUE,
                     marginHorizontal: moderateScale(5),
                     borderRadius: moderateScale(10),
                   }}>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+                      fontSize: textScale(14),
+                      color: colors.WHITE,
+                    }}>
+                    {item?.name ? item?.name : 'No name available'}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.POPPINS_REGULAR,
+                      fontSize: textScale(12),
+                      color: colors.WHITE,
+                    }}>
+                    {`${item?.brand ? item?.brand : 'No brand'} ${
+                      item?.model ? item?.model : 'No model'
+                    }`}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.POPPINS_REGULAR,
+                      fontSize: textScale(12),
+                      color: colors.WHITE,
+                    }}>
+                    {item?.category ? item?.category : 'No category available'}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.POPPINS_REGULAR,
+                      fontSize: textScale(12),
+                      color: colors.WHITE,
+                    }}>
+                    {item?.year ? item?.year : 'No year available'}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.POPPINS_REGULAR,
+                      fontSize: textScale(12),
+                      color: colors.WHITE,
+                    }}>
+                    {item?.seater ? item?.seater : 'No seater available'}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.POPPINS_REGULAR,
+                      fontSize: textScale(12),
+                      color: colors.WHITE,
+                    }}>
+                    {item?.location ? item?.location : 'No location available'}
+                  </Text>
+
                   <Image
-                    resizeMode="contain"
-                    source={item.image}
+                    resizeMode="cover"
+                    source={{
+                      uri:
+                        Array.isArray(item.externalImage) &&
+                        item.externalImage.length > 0
+                          ? item.externalImage[0]
+                          : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-_Q04if8V8D3_si9dRkfhuqXAOooal8mYXg&usqp=CAU', // Fallback to local image if no image from API
+                    }}
                     style={{
                       width: moderateScale(180),
-                      height: moderateScale(307),
+                      height: moderateScale(120),
+                      alignSelf: 'center',
                     }}
                   />
                 </View>

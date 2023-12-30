@@ -12,6 +12,8 @@ import fontFamily from '../../../styles/fontFamily';
 import axios from 'axios';
 import routes from '../../../constants/routes';
 import Toast from 'react-native-toast-message';
+import {signUpAsyncThunk} from '../../redux/authAsyncThunk/authAsyncThunk';
+import {useDispatch} from 'react-redux';
 const SignUpScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setlastName] = useState('');
@@ -23,7 +25,7 @@ const SignUpScreen = () => {
   const [area, setArea] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [city, setCity] = useState('');
-
+  const dispatch = useDispatch();
   const checkValidation = () => {
     if (email === null || email.trim() === '') {
       Toast.show({
@@ -80,45 +82,52 @@ const SignUpScreen = () => {
       handleSignUp();
     }
   };
-  const handleSignUp = async () => {
-    try {
-      const response = await axios.post(
-        'https://injazrental.onrender.com/user/signUp',
-        {
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          phoneNumber: mobile,
-          password: password,
-          address: address,
-          locality: locality,
-          area: area,
-          zipcode: zipCode,
-          city: city,
-        },
-      );
-      if (response.data) {
-        navigation.navigate(routes.LOGIN_SCREEN);
-        console.log(response.data, '.......response');
-      }
-    } catch (error) {
-      // Handle error (e.g., show an error message)
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        Toast.show({
-          type: 'error',
-          text1: error.response.data.message,
-        });
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'An unexpected error occurred. Please try again.',
-        });
-      }
-    }
+
+  const handleSignUp = () => {
+    const payload = {
+      firstName,
+      lastName,
+      email,
+      phoneNumber: mobile,
+      password,
+      address,
+      locality,
+      area,
+      zipcode: zipCode,
+      city,
+    };
+
+    dispatch(signUpAsyncThunk(payload))
+      .unwrap()
+      .then(res => {
+        console.log('Response:', res);
+
+        const responseData = res.data;
+        console.log('Response Data:', responseData);
+
+        if (responseData && responseData.status === 201) {
+          Toast.show({
+            type: 'success',
+            text1: responseData.message,
+          });
+          navigation.navigate(routes.LOGIN_SCREEN);
+        }
+      })
+      .catch(error => {
+        if (error.response && error.response.status === 401) {
+          Toast.show({
+            type: 'error',
+            text1: error.response.data.message,
+          });
+        } else {
+          console.error('Error signing in:', error);
+          Toast.show({
+            type: 'error',
+            text1: error.response.data.message,
+            topOffset: moderateScale(90),
+          });
+        }
+      });
   };
 
   const navigation = useNavigation();

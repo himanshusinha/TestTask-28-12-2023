@@ -67,11 +67,9 @@ const BottomStack = () => {
           position: 'absolute',
           borderTopWidth: 0,
         },
+        tabBarShowLabel: false,
       }}
-      initialRouteName="Home"
-      tabBarOptions={{
-        showLabel: false,
-      }}>
+      initialRouteName="Home">
       <Tab.Screen
         name={routes.HOME_SCREEN}
         component={HomeScreen}

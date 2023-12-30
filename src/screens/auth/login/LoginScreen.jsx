@@ -8,13 +8,13 @@ import colors from '../../../constants/colors';
 import {moderateScale} from '../../../styles/responsiveSize';
 import ButtonComp from '../../../components/button/ButtonComp';
 import fontFamily from '../../../styles/fontFamily';
-import axios from 'axios';
 import {useDispatch} from 'react-redux';
 import {loginAsyncThunk} from '../../redux/authAsyncThunk/authAsyncThunk';
-import Toast from 'react-native-toast-message';
 import {useNavigation} from '@react-navigation/native';
 import routes from '../../../constants/routes';
 import {setAuthResponse} from '../../redux/slices/auth.slice';
+import Toast from 'react-native-toast-message';
+import axios from 'axios';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -45,7 +45,6 @@ const LoginScreen = () => {
 
       if (response && response.data && response.data.token) {
         const token = response.data.token;
-        console.log(token);
         dispatch(setAuthResponse(response.data));
         Toast.show({
           type: 'success',
@@ -60,7 +59,6 @@ const LoginScreen = () => {
           text1: error.response.data.message,
         });
       } else {
-        console.error('Error signing in:', error);
         Toast.show({
           type: 'error',
           text1: error.response.data.message,
@@ -69,7 +67,6 @@ const LoginScreen = () => {
       }
     }
   };
-
   return (
     <KeyboardAwareScrollView
       showsVerticalScrollIndicator={false}

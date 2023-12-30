@@ -1,6 +1,6 @@
 // auth_services.js
 import Axios from 'axios';
-import {METHODS, SERVICE_ROUTES} from '../constants';
+import {METHODS} from '../constants';
 
 //loginService
 export const loginService = data => {
@@ -10,9 +10,11 @@ export const loginService = data => {
       method: METHODS.POST,
       data,
     };
+
     Axios.request(config)
       .then(res => {
-        console.log(res, '............response login service');
+        console.log(res, '.......response from signup services');
+
         resolve(res);
       })
       .catch(err => {
@@ -25,9 +27,8 @@ export const loginService = data => {
 export const signUpService = data => {
   return new Promise((resolve, reject) => {
     let config = {
-      url: 'https://injazrental.onrender.com',
+      url: 'https://injazrental.onrender.com/user/signUp',
       method: METHODS.POST,
-      headers: {'Content-Type': 'multipart/form-data'},
       data,
     };
 
@@ -39,6 +40,26 @@ export const signUpService = data => {
       })
       .catch(err => {
         reject(err);
+      });
+  });
+};
+// getAllCarsService
+export const getAllCarsService = (data = {}) => {
+  return new Promise((resolve, reject) => {
+    let config = {
+      url: 'https://api.injazrent.ae/user/getAllCars',
+      method: METHODS.GET,
+      data: data,
+    };
+
+    Axios.request(config)
+      .then(res => {
+        console.log(res, '.......response from get all cars services');
+        resolve(res);
+      })
+      .catch(err => {
+        console.error('Error in getAllCarsService:', err.message);
+        reject(err.message); // Reject with a specific error message
       });
   });
 };
