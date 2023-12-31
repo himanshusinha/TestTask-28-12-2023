@@ -5,18 +5,18 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: moderateScale(40),
+    height: moderateScale(45),
     borderColor: colors.GRAY,
     borderWidth: moderateScale(0.5),
-    borderRadius: moderateScale(0.5),
+    borderRadius: moderateScale(10),
     backgroundColor: colors.GRAY,
   },
   imageStyle: {
-    width: moderateScale(20),
-    height: moderateScale(20),
+    width: moderateScale(18),
+    height: moderateScale(18),
     marginRight: moderateScale(5),
     marginHorizontal: moderateScale(10),
-    marginLeft: moderateScale(10),
+    marginLeft: moderateScale(20),
     marginEnd: moderateScale(10),
   },
   inputStyle: {

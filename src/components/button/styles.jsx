@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     color: colors.WHITE,
-    fontSize: textScale(16),
+    fontSize: textScale(12),
   },
 });
 export default styles;

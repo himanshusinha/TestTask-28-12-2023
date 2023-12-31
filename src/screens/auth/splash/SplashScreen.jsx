@@ -16,11 +16,6 @@ const SplashScreen = () => {
   }, [navigation]);
   return (
     <View style={styles.container}>
-      <AppStatusBar
-        hidden={true}
-        backgroundColor={'white'}
-        barStyle="light-content"
-      />
       <Image source={images.logo} style={styles.logoStyle} />
     </View>
   );

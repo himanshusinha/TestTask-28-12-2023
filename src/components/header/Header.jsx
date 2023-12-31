@@ -21,7 +21,8 @@ const Header = ({
           justifyContent: 'space-between',
           marginStart: moderateScale(15),
           marginTop:
-            Platform.OS === 'ios' ? moderateScale(55) : moderateScale(20),
+            Platform.OS === 'ios' ? moderateScale(55) : moderateScale(30),
+          bottom: 10,
         }}>
         <Image
           source={iconCountryFlag}
@@ -51,6 +52,7 @@ const Header = ({
           flexDirection: 'row',
           marginTop:
             Platform.OS === 'ios' ? moderateScale(50) : moderateScale(10),
+          bottom: 10,
 
           marginEnd: moderateScale(10),
           borderWidth: 1,
@@ -61,7 +63,7 @@ const Header = ({
           justifyContent: 'center',
           alignItems: 'center',
           marginTop:
-            Platform.OS === 'ios' ? moderateScale(50) : moderateScale(10),
+            Platform.OS === 'ios' ? moderateScale(50) : moderateScale(25),
         }}>
         <Image
           source={iconGift}
@@ -84,9 +86,11 @@ const Header = ({
             width: moderateScale(25),
             height: moderateScale(25),
             marginTop:
-              Platform.OS === 'ios' ? moderateScale(60) : moderateScale(20),
+              Platform.OS === 'ios' ? moderateScale(60) : moderateScale(40),
             marginEnd: moderateScale(13),
             alignSelf: 'center',
+            bottom:
+              Platform.OS === 'ios' ? moderateScale(10) : moderateScale(20),
           }}
         />
       </TouchableOpacity>

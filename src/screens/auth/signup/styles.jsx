@@ -1,10 +1,11 @@
-import {StyleSheet} from 'react-native';
+import {Platform, StyleSheet} from 'react-native';
 import {
   moderateScale,
   moderateScaleVertical,
   scale,
 } from '../../../styles/responsiveSize';
 import colors from '../../../constants/colors';
+import fontFamily from '../../../styles/fontFamily';
 
 const styles = StyleSheet.create({
   inputStyle: {
@@ -14,13 +15,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.WHITE,
     justifyContent: 'center',
+    marginTop: 10,
   },
   inputContainer: {
-    flex: 0.8,
+    flex: 0.9,
     backgroundColor: colors.WHITE,
     justifyContent: 'center',
     marginHorizontal: moderateScaleVertical(20),
-    paddingBottom: moderateScale(40),
+    marginTop: moderateScaleVertical(100),
   },
   heading: {
     paddingVertical: moderateScale(30),
@@ -30,7 +32,7 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   inputStyle: {
-    paddingBottom: moderateScaleVertical(30),
+    paddingBottom: moderateScaleVertical(40),
   },
   bottomContainer: {
     backgroundColor: colors.WHITE,
@@ -40,24 +42,34 @@ const styles = StyleSheet.create({
     marginTop: moderateScaleVertical(40),
   },
   signUpText: {
-    fontSize: scale(14),
+    fontSize: scale(10),
+    fontFamily: fontFamily.POPPINS_REGULAR,
+    color: 'black',
   },
   signUpButton: {
-    color: colors.themeColor,
-    fontSize: scale(14),
-    fontWeight: 'bold',
+    fontSize: scale(10),
+    fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+    color: colors.REDDISH,
+    marginStart: moderateScale(4),
   },
   scrollStyle: {
-    marginTop: moderateScaleVertical(120),
     backgroundColor: colors.WHITE,
-    justifyContent: 'center',
+    flex: 1,
   },
   viewStyle: {
     marginTop: moderateScaleVertical(10),
+    bottom: moderateScale(70),
   },
   errorText: {
     color: colors.RED,
     marginTop: moderateScale(10),
+  },
+  bottomContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: moderateScale(50),
+    paddingBottom: moderateScale(30),
   },
 });
 export default styles;

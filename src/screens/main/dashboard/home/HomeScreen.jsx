@@ -7,6 +7,7 @@ import {
   Dimensions,
   Image,
   Platform,
+  StatusBar,
 } from 'react-native';
 import React, {useRef, useEffect, useState} from 'react';
 import colors from '../../../../constants/colors';
@@ -22,7 +23,9 @@ import {clearResponse} from '../../../redux/slices/auth.slice';
 import {
   bannerData,
   categoriesData,
+  exoticCarData,
   popularCarData,
+  topCarData,
 } from '../../../../constants/list';
 import fontFamily from '../../../../styles/fontFamily';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -34,12 +37,8 @@ const HomeScreen = () => {
   const flatListRef = useRef(null);
   const autoplayInterval = 3000;
   const [data, setData] = useState(bannerData);
-  const apiUrl = 'https://api.injazrent.ae/user/getAllCars';
-  const [categoriesData, setCategoriesData] = useState([]);
-  const [carsData, setCarsData] = useState([]);
-  const [filteredCars, setFilteredCars] = useState('');
+  const [carsPager, setCarsPager] = useState(exoticCarData);
 
-  console.log(categoriesData, '......categoriesDAta');
   useEffect(() => {
     const autoplayTimer = setInterval(() => {
       const nextIndex = (currentIndex + 1) % data.length;
@@ -49,45 +48,7 @@ const HomeScreen = () => {
     }, autoplayInterval);
 
     return () => clearInterval(autoplayTimer);
-  }, [currentIndex]);
-  useEffect(() => {
-    fetch(apiUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(apiResponse => {
-        if (
-          apiResponse &&
-          Array.isArray(apiResponse.data) &&
-          apiResponse.data.length > 0
-        ) {
-          setCarsData(apiResponse.data);
-          setFilteredCars(apiResponse.data);
-
-          const categories = apiResponse.data
-            .map(car => car.category)
-            .filter((value, index, self) => self.indexOf(value) === index);
-          setCategoriesData(categories);
-        } else {
-          console.log('No car data found in the API response.');
-        }
-      })
-      .catch(error => {
-        Toast.show({
-          type: 'error',
-          text1: error.message,
-          topOffset: moderateScale(90),
-        });
-      });
   }, []);
-  const handleCategoryPress = category => {
-    const filtered = carsData.filter(car => car.category === category);
-    setFilteredCars(filtered);
-  };
-
   return (
     <View style={{flex: 1, backgroundColor: colors.WHITE}}>
       <View
@@ -97,6 +58,12 @@ const HomeScreen = () => {
           backgroundColor: colors.NAVY_BLUE,
           justifyContent: 'center',
         }}>
+        <StatusBar
+          backgroundColor={colors.BLACK}
+          translucent={true}
+          hidden={true}
+          barStyle="dark-content"
+        />
         <Header
           onPress={() => {
             dispatch(clearResponse());
@@ -110,7 +77,7 @@ const HomeScreen = () => {
         />
       </View>
       <KeyboardAwareScrollView
-        contentContainerStyle={{paddingBottom: moderateScale(10)}}
+        contentContainerStyle={{paddingBottom: moderateScale(60)}}
         showsVerticalScrollIndicator={false}>
         <FlatList
           ref={flatListRef}
@@ -185,7 +152,7 @@ const HomeScreen = () => {
                 key={item.id}
                 style={{
                   width: moderateScale(14),
-                  height: moderateScale(5),
+                  height: moderateScale(2),
                   bottom: moderateScale(100),
                   borderRadius: moderateScale(5),
                   backgroundColor:
@@ -215,10 +182,8 @@ const HomeScreen = () => {
             contentContainerStyle={{justifyContent: 'space-between'}}
             data={categoriesData}
             renderItem={({item}) => {
-              console.log(item, '.........popular cars');
               return (
                 <TouchableOpacity
-                  onPress={() => handleCategoryPress(item)}
                   activeOpacity={0.8}
                   style={{
                     flexDirection: 'row',
@@ -228,34 +193,24 @@ const HomeScreen = () => {
                   <View
                     style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Image
-                      resizeMode="contain"
-                      source={{
-                        uri:
-                          Array.isArray(item.image) && item.image.length > 0
-                            ? item.image[0]
-                            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-_Q04if8V8D3_si9dRkfhuqXAOooal8mYXg&usqp=CAU', // Fallback to local image if no image from API
-                      }}
                       style={{
-                        width: moderateScale(100),
-                        height: moderateScale(100),
+                        width: moderateScale(60),
+                        height: moderateScale(60),
                       }}
-                      onError={e =>
-                        console.log('Error loading image:', e.nativeEvent.error)
-                      }
+                      source={item?.image}
                     />
                     <Text
                       style={{
                         fontSize: textScale(10),
                         fontFamily: fontFamily.POPPINS_SEMI_BOLD,
                       }}>
-                      {item ? item : 'no category'}
+                      {item.category}
                     </Text>
                   </View>
                 </TouchableOpacity>
               );
             }}
           />
-
           <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -322,7 +277,7 @@ const HomeScreen = () => {
               flexDirection: 'row',
               justifyContent: 'space-between',
               bottom: moderateScale(12),
-              marginHorizontal: moderateScale(10),
+              marginHorizontal: moderateScale(20),
             }}>
             <Text
               style={{
@@ -338,6 +293,7 @@ const HomeScreen = () => {
                   fontSize: textScale(14),
                   color: colors.NAVY_BLUE,
                   fontFamily: fontFamily.POPPINS_REGULAR,
+                  fontWeight: '300',
                 }}>
                 {' View All >>'}
               </Text>
@@ -346,87 +302,433 @@ const HomeScreen = () => {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={filteredCars}
+            data={popularCarData}
             renderItem={({item}) => {
               return (
                 <View
                   style={{
-                    width: moderateScale(240),
+                    width: moderateScale(200),
                     height: moderateScale(300),
                     backgroundColor: colors.NAVY_BLUE,
                     marginHorizontal: moderateScale(5),
                     borderRadius: moderateScale(10),
                   }}>
-                  <Text
-                    style={{
-                      fontFamily: fontFamily.POPPINS_SEMI_BOLD,
-                      fontSize: textScale(14),
-                      color: colors.WHITE,
-                    }}>
-                    {item?.name ? item?.name : 'No name available'}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: fontFamily.POPPINS_REGULAR,
-                      fontSize: textScale(12),
-                      color: colors.WHITE,
-                    }}>
-                    {`${item?.brand ? item?.brand : 'No brand'} ${
-                      item?.model ? item?.model : 'No model'
-                    }`}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: fontFamily.POPPINS_REGULAR,
-                      fontSize: textScale(12),
-                      color: colors.WHITE,
-                    }}>
-                    {item?.category ? item?.category : 'No category available'}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: fontFamily.POPPINS_REGULAR,
-                      fontSize: textScale(12),
-                      color: colors.WHITE,
-                    }}>
-                    {item?.year ? item?.year : 'No year available'}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: fontFamily.POPPINS_REGULAR,
-                      fontSize: textScale(12),
-                      color: colors.WHITE,
-                    }}>
-                    {item?.seater ? item?.seater : 'No seater available'}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: fontFamily.POPPINS_REGULAR,
-                      fontSize: textScale(12),
-                      color: colors.WHITE,
-                    }}>
-                    {item?.location ? item?.location : 'No location available'}
-                  </Text>
-
                   <Image
-                    resizeMode="cover"
-                    source={{
-                      uri:
-                        Array.isArray(item.externalImage) &&
-                        item.externalImage.length > 0
-                          ? item.externalImage[0]
-                          : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-_Q04if8V8D3_si9dRkfhuqXAOooal8mYXg&usqp=CAU', // Fallback to local image if no image from API
-                    }}
+                    resizeMode="contain"
+                    source={item.image}
                     style={{
                       width: moderateScale(180),
-                      height: moderateScale(120),
-                      alignSelf: 'center',
+                      height: moderateScale(306),
                     }}
                   />
                 </View>
               );
             }}
           />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              top: moderateScale(18),
+              marginHorizontal: moderateScale(20),
+            }}>
+            <Text
+              style={{
+                fontSize: textScale(18),
+                color: colors.NAVY_BLUE,
+                fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+              }}>
+              Top cars of the month
+            </Text>
+            <TouchableOpacity activeOpacity={0.8}>
+              <Text
+                style={{
+                  fontSize: textScale(14),
+                  color: colors.NAVY_BLUE,
+                  fontFamily: fontFamily.POPPINS_REGULAR,
+                  fontWeight: '300',
+                }}>
+                {' View All >>'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            horizontal
+            contentContainerStyle={{marginTop: moderateScale(34)}}
+            showsHorizontalScrollIndicator={false}
+            data={topCarData}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={{
+                    width: moderateScale(200),
+                    height: moderateScale(300),
+                    backgroundColor: colors.NAVY_BLUE,
+                    marginHorizontal: moderateScale(5),
+                    borderRadius: moderateScale(10),
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    source={item.image}
+                    style={{
+                      width: moderateScale(180),
+                      height: moderateScale(306),
+                    }}
+                  />
+                </View>
+              );
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              top: moderateScale(18),
+              marginHorizontal: moderateScale(20),
+            }}>
+            <Text
+              style={{
+                fontSize: textScale(18),
+                color: colors.NAVY_BLUE,
+                fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+              }}>
+              Compact cars
+            </Text>
+            <TouchableOpacity activeOpacity={0.8}>
+              <Text
+                style={{
+                  fontSize: textScale(14),
+                  color: colors.NAVY_BLUE,
+                  fontFamily: fontFamily.POPPINS_REGULAR,
+                  fontWeight: '300',
+                }}>
+                {' View All >>'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            horizontal
+            contentContainerStyle={{marginTop: moderateScale(34)}}
+            showsHorizontalScrollIndicator={false}
+            data={topCarData}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={{
+                    width: moderateScale(200),
+                    height: moderateScale(300),
+                    backgroundColor: colors.NAVY_BLUE,
+                    marginHorizontal: moderateScale(5),
+                    borderRadius: moderateScale(10),
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    source={item.image}
+                    style={{
+                      width: moderateScale(180),
+                      height: moderateScale(306),
+                    }}
+                  />
+                </View>
+              );
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              top: moderateScale(20),
+              marginHorizontal: moderateScale(20),
+            }}>
+            <Text
+              style={{
+                fontSize: textScale(18),
+                color: colors.NAVY_BLUE,
+                fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+              }}>
+              SUV cars
+            </Text>
+            <TouchableOpacity activeOpacity={0.8}>
+              <Text
+                style={{
+                  fontSize: textScale(14),
+                  color: colors.NAVY_BLUE,
+                  fontFamily: fontFamily.POPPINS_REGULAR,
+                  fontWeight: '300',
+                }}>
+                {' View All >>'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            horizontal
+            contentContainerStyle={{marginTop: moderateScale(34)}}
+            showsHorizontalScrollIndicator={false}
+            data={topCarData}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={{
+                    width: moderateScale(200),
+                    height: moderateScale(300),
+                    backgroundColor: colors.NAVY_BLUE,
+                    marginHorizontal: moderateScale(5),
+                    borderRadius: moderateScale(10),
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    source={item.image}
+                    style={{
+                      width: moderateScale(180),
+                      height: moderateScale(306),
+                    }}
+                  />
+                </View>
+              );
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              top: moderateScale(20),
+              marginHorizontal: moderateScale(20),
+            }}>
+            <Text
+              style={{
+                fontSize: textScale(18),
+                color: colors.NAVY_BLUE,
+                fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+              }}>
+              Sedan cars
+            </Text>
+            <TouchableOpacity activeOpacity={0.8}>
+              <Text
+                style={{
+                  fontSize: textScale(14),
+                  color: colors.NAVY_BLUE,
+                  fontFamily: fontFamily.POPPINS_REGULAR,
+                  fontWeight: '300',
+                }}>
+                {' View All >>'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            horizontal
+            contentContainerStyle={{marginTop: moderateScale(34)}}
+            showsHorizontalScrollIndicator={false}
+            data={topCarData}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={{
+                    width: moderateScale(200),
+                    height: moderateScale(300),
+                    backgroundColor: colors.NAVY_BLUE,
+                    marginHorizontal: moderateScale(5),
+                    borderRadius: moderateScale(10),
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    source={item.image}
+                    style={{
+                      width: moderateScale(180),
+                      height: moderateScale(306),
+                    }}
+                  />
+                </View>
+              );
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              top: moderateScale(20),
+              marginHorizontal: moderateScale(20),
+            }}>
+            <Text
+              style={{
+                fontSize: textScale(18),
+                color: colors.NAVY_BLUE,
+                fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+              }}>
+              Hatchback cars
+            </Text>
+            <TouchableOpacity activeOpacity={0.8}>
+              <Text
+                style={{
+                  fontSize: textScale(14),
+                  color: colors.NAVY_BLUE,
+                  fontFamily: fontFamily.POPPINS_REGULAR,
+                  fontWeight: '300',
+                }}>
+                {' View All >>'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            horizontal
+            contentContainerStyle={{marginTop: moderateScale(34)}}
+            showsHorizontalScrollIndicator={false}
+            data={topCarData}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={{
+                    width: moderateScale(200),
+                    height: moderateScale(300),
+                    backgroundColor: colors.NAVY_BLUE,
+                    marginHorizontal: moderateScale(5),
+                    borderRadius: moderateScale(10),
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    source={item.image}
+                    style={{
+                      width: moderateScale(180),
+                      height: moderateScale(306),
+                    }}
+                  />
+                </View>
+              );
+            }}
+          />
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              top: moderateScale(20),
+              marginHorizontal: moderateScale(20),
+            }}>
+            <Text
+              style={{
+                fontSize: textScale(18),
+                color: colors.NAVY_BLUE,
+                fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+              }}>
+              Luxary cars
+            </Text>
+            <TouchableOpacity activeOpacity={0.8}>
+              <Text
+                style={{
+                  fontSize: textScale(14),
+                  color: colors.NAVY_BLUE,
+                  fontFamily: fontFamily.POPPINS_REGULAR,
+                  fontWeight: '300',
+                }}>
+                {' View All >>'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            horizontal
+            contentContainerStyle={{marginTop: moderateScale(34)}}
+            showsHorizontalScrollIndicator={false}
+            data={topCarData}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={{
+                    width: moderateScale(200),
+                    height: moderateScale(300),
+                    backgroundColor: colors.NAVY_BLUE,
+                    marginHorizontal: moderateScale(5),
+                    borderRadius: moderateScale(10),
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    source={item.image}
+                    style={{
+                      width: moderateScale(180),
+                      height: moderateScale(306),
+                    }}
+                  />
+                </View>
+              );
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              top: moderateScale(20),
+              marginHorizontal: moderateScale(20),
+            }}>
+            <Text
+              style={{
+                fontSize: textScale(18),
+                color: colors.NAVY_BLUE,
+                fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+              }}>
+              Exotic cars
+            </Text>
+            <TouchableOpacity activeOpacity={0.8}>
+              <Text
+                style={{
+                  fontSize: textScale(14),
+                  color: colors.NAVY_BLUE,
+                  fontFamily: fontFamily.POPPINS_REGULAR,
+                  fontWeight: '300',
+                }}>
+                {' View All >>'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            horizontal
+            contentContainerStyle={{marginTop: moderateScale(34)}}
+            showsHorizontalScrollIndicator={false}
+            data={topCarData}
+            renderItem={({item}) => {
+              return (
+                <View
+                  style={{
+                    width: moderateScale(200),
+                    height: moderateScale(300),
+                    backgroundColor: colors.NAVY_BLUE,
+                    marginHorizontal: moderateScale(5),
+                    borderRadius: moderateScale(10),
+                  }}>
+                  <Image
+                    resizeMode="contain"
+                    source={item.image}
+                    style={{
+                      width: moderateScale(180),
+                      height: moderateScale(306),
+                    }}
+                  />
+                </View>
+              );
+            }}
+          />
+
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              top: moderateScale(30),
+              flexDirection: 'row',
+            }}>
+            <Image
+              style={{
+                width: moderateScale(10),
+                height: moderateScale(2),
+                marginHorizontal: moderateScale(4),
+              }}
+              source={images.active_dot}
+            />
+            <Image
+              style={{
+                width: moderateScale(10),
+                height: moderateScale(2),
+                marginHorizontal: moderateScale(4),
+              }}
+              source={images.inactive_dot}
+            />
+          </View>
         </View>
       </KeyboardAwareScrollView>
     </View>

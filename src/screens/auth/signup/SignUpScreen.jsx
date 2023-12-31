@@ -1,86 +1,153 @@
-import {View} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ImageBackground,
+  Image,
+  ScrollView,
+} from 'react-native';
 import React, {useState} from 'react';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import InputField from '../../../components/input/InputField';
 import styles from './styles';
 import images from '../../../constants/images';
 import colors from '../../../constants/colors';
-import {moderateScale} from '../../../styles/responsiveSize';
-import {useNavigation} from '@react-navigation/native';
+import {moderateScale, textScale} from '../../../styles/responsiveSize';
 import ButtonComp from '../../../components/button/ButtonComp';
 import fontFamily from '../../../styles/fontFamily';
-import axios from 'axios';
+import {useDispatch} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 import routes from '../../../constants/routes';
 import Toast from 'react-native-toast-message';
 import {signUpAsyncThunk} from '../../redux/authAsyncThunk/authAsyncThunk';
-import {useDispatch} from 'react-redux';
+import {Modal} from 'react-native-paper';
 const SignUpScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setlastName] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [address, setAddress] = useState('');
   const [locality, setLocality] = useState('');
+  const [passwordMatch, setPasswordMatch] = useState(true);
   const [area, setArea] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [city, setCity] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(true);
   const dispatch = useDispatch();
+
   const checkValidation = () => {
-    if (email === null || email.trim() === '') {
+    let errors = {};
+
+    if (firstName === null || firstName.trim() === '') {
       Toast.show({
         type: 'error',
-        text1: 'Please Enter firstName',
+        text1: 'Please Enter First Name',
         topOffset: moderateScale(60),
       });
-    } else if (lastName === null || lastName.trim() === '') {
+      return;
+    }
+
+    if (lastName === null || lastName.trim() === '') {
       Toast.show({
         type: 'error',
-        text1: 'Please Enter lastName',
+        text1: 'Please Enter Last Name',
       });
-    } else if (email === null || email.trim() === '') {
+      return;
+    }
+
+    if (email === null || email.trim() === '') {
       Toast.show({
         type: 'error',
         text1: 'Please Enter Email ID',
       });
-    } else if (mobile === null || mobile.trim() === '') {
+      return;
+    }
+
+    if (mobile === null || mobile.trim() === '') {
       Toast.show({
         type: 'error',
         text1: 'Please Enter Mobile Number',
       });
-    } else if (password === null || password.trim() === '') {
+      return;
+    }
+
+    if (password === null || password.trim() === '') {
       Toast.show({
         type: 'error',
         text1: 'Please Enter Password',
       });
-    } else if (address === null || address.trim() === '') {
+
+      const passwordRegex =
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()]).{8,}$/;
+      if (!passwordRegex.test(password)) {
+        errors.password =
+          'Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 8 characters long.';
+      }
+
+      return;
+    }
+
+    if (confirmPassword === null || confirmPassword.trim() === '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Please Enter Confirm Password',
+      });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setPasswordMatch(false);
+      Toast.show({
+        type: 'error',
+        text1: 'Passwords do not match',
+      });
+      return;
+    } else {
+      setPasswordMatch(true);
+    }
+
+    if (address === null || address.trim() === '') {
       Toast.show({
         type: 'error',
         text1: 'Please Enter Address',
       });
-    } else if (locality === null || locality.trim() === '') {
+      return;
+    }
+
+    if (locality === null || locality.trim() === '') {
       Toast.show({
         type: 'error',
         text1: 'Please Enter Locality',
       });
-    } else if (area === null || area.trim() === '') {
+      return;
+    }
+
+    if (area === null || area.trim() === '') {
       Toast.show({
         type: 'error',
         text1: 'Please Enter Area',
       });
-    } else if (zipCode === null || zipCode.trim() === '') {
+      return;
+    }
+
+    if (zipCode === null || zipCode.trim() === '') {
       Toast.show({
         type: 'error',
         text1: 'Please Enter zipCode',
       });
-    } else if (city === null || city.trim() === '') {
+      return;
+    }
+
+    if (city === null || city.trim() === '') {
       Toast.show({
         type: 'error',
         text1: 'Please Enter City',
       });
-    } else {
-      handleSignUp();
+      return;
     }
+
+    handleSignUp();
   };
 
   const handleSignUp = () => {
@@ -110,218 +177,386 @@ const SignUpScreen = () => {
             type: 'success',
             text1: responseData.message,
           });
+
           navigation.navigate(routes.LOGIN_SCREEN);
         }
       })
       .catch(error => {
-        if (error.response && error.response.status === 401) {
-          Toast.show({
-            type: 'error',
-            text1: error.response.data.message,
-          });
-        } else {
-          console.error('Error signing in:', error);
-          Toast.show({
-            type: 'error',
-            text1: error.response.data.message,
-            topOffset: moderateScale(90),
-          });
+        let errorMessage = error.message;
+
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          errorMessage = error.response.data.message;
+        } else if (error.response && typeof error.response === 'string') {
+          errorMessage = error.response.data.message;
         }
+
+        Toast.show({
+          type: 'error',
+          text1: errorMessage,
+          topOffset: moderateScale(90),
+        });
       });
   };
 
   const navigation = useNavigation();
   return (
-    <KeyboardAwareScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.scrollStyle}>
-      <View>
-        <View style={styles.container}>
-          <View style={styles.inputContainer}>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Email}
-                mode="outlined"
-                label="firstName"
-                placeholder="firstName"
-                outlineColor={colors.TRANSPARENT}
-                activeOutlineColor={colors.TRANSPARENT}
-                textColor={colors.BLACK}
-                value={firstName}
-                autoCapitalize={'none'}
-                onChangeText={e => setFirstName(e)}
-              />
-            </View>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Email}
-                mode="outlined"
-                label="lastName"
-                placeholder="lastName"
-                outlineColor={colors.TRANSPARENT}
-                activeOutlineColor={colors.TRANSPARENT}
-                textColor={colors.BLACK}
-                value={lastName}
-                autoCapitalize={'none'}
-                onChangeText={e => setlastName(e)}
-              />
-            </View>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Email}
-                mode="outlined"
-                label="Email ID"
-                placeholder="Email ID"
-                outlineColor={colors.TRANSPARENT}
-                activeOutlineColor={colors.TRANSPARENT}
-                textColor={colors.BLACK}
-                value={email}
-                autoCapitalize={'none'}
-                onChangeText={e => setEmail(e)}
-              />
-            </View>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Lock}
-                rightIcon={images.Hide}
-                label="Mobile Number"
-                placeholder="Mobile Number"
-                activeOutlineColor={colors.GRAY}
-                textColor={colors.GRAY}
-                value={mobile}
-                autoCapitalize={'none'}
-                onChangeText={e => setMobile(e)}
-                secureTextEntry={true}
-                outlineColor={colors.GRAY}
-                mode={'flat'}
-              />
-            </View>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Lock}
-                rightIcon={images.Hide}
-                label="Password"
-                placeholder="Password"
-                activeOutlineColor={colors.GRAY}
-                textColor={colors.GRAY}
-                value={password}
-                autoCapitalize={'none'}
-                onChangeText={e => setPassword(e)}
-                secureTextEntry={true}
-                outlineColor={colors.GRAY}
-                mode={'flat'}
-              />
+    <View style={{flex: 1}}>
+      <ImageBackground
+        source={{
+          uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl0fwN_O2DmuoaVSmA9Hzf-gBONjOYuF_V2w&usqp=CAU',
+        }}
+        style={{flexGrow: 1}}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: colors.WHITE,
+            marginTop: moderateScale(100),
+            borderTopLeftRadius: moderateScale(40),
+            borderTopRightRadius: moderateScale(40),
+            overflow: 'hidden',
+          }}>
+          <View style={styles.container}>
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <View
+                style={{
+                  width: '8%',
+                  borderRadius: moderateScale(3),
+                  borderWidth: moderateScale(3),
+                  borderColor: colors.GRAY_SECONDARY,
+                  backgroundColor: colors.GRAY_SECONDARY,
+                  height: 3,
+                }}></View>
             </View>
 
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Lock}
-                rightIcon={images.Hide}
-                label="Address"
-                placeholder="Address"
-                activeOutlineColor={colors.GRAY}
-                textColor={colors.GRAY}
-                value={address}
-                autoCapitalize={'none'}
-                onChangeText={e => setAddress(e)}
-                secureTextEntry={true}
-                outlineColor={colors.GRAY}
-                mode={'flat'}
-              />
-            </View>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Lock}
-                rightIcon={images.Hide}
-                label="Locality"
-                placeholder="Locality"
-                activeOutlineColor={colors.GRAY}
-                textColor={colors.GRAY}
-                value={locality}
-                autoCapitalize={'none'}
-                onChangeText={e => setLocality(e)}
-                secureTextEntry={true}
-                outlineColor={colors.GRAY}
-                mode={'flat'}
-              />
-            </View>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Lock}
-                rightIcon={images.Hide}
-                label="Area"
-                placeholder="Area"
-                activeOutlineColor={colors.GRAY}
-                textColor={colors.GRAY}
-                value={area}
-                autoCapitalize={'none'}
-                onChangeText={e => setArea(e)}
-                secureTextEntry={true}
-                outlineColor={colors.GRAY}
-                mode={'flat'}
-              />
-            </View>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Lock}
-                rightIcon={images.Hide}
-                label="ZipCode"
-                placeholder="ZipCode"
-                activeOutlineColor={colors.GRAY}
-                textColor={colors.GRAY}
-                value={zipCode}
-                autoCapitalize={'none'}
-                onChangeText={e => setZipCode(e)}
-                secureTextEntry={true}
-                outlineColor={colors.GRAY}
-                mode={'flat'}
-              />
-            </View>
-            <View style={styles.viewStyle}>
-              <InputField
-                leftIcon={images.Lock}
-                rightIcon={images.Hide}
-                label="City"
-                placeholder="City"
-                activeOutlineColor={colors.GRAY}
-                textColor={colors.GRAY}
-                value={city}
-                autoCapitalize={'none'}
-                onChangeText={e => setCity(e)}
-                secureTextEntry={true}
-                outlineColor={colors.GRAY}
-                mode={'flat'}
-              />
-            </View>
-          </View>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              bottom: moderateScale(20),
-            }}>
-            <ButtonComp
-              text="Sign Up"
-              textStyle={{
-                color: colors.WHITE,
-                fontWeight: 'bold',
-                fontFamily: fontFamily.POPPINS_BOLD,
-              }}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              bounces={false}
               style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: colors.REDDISH,
-                height: moderateScale(45),
-                width: '90%',
-              }}
-              onPress={() => {
-                checkValidation();
-              }}
-            />
+                flexGrow: 1,
+              }}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: moderateScale(10),
+                }}>
+                <Text
+                  style={{
+                    color: colors.BLACK,
+                    fontSize: textScale(14),
+                    fontFamily: fontFamily.POPPINS_REGULAR,
+                  }}>
+                  Welcome Back 👋🏻
+                </Text>
+                <Text
+                  style={{
+                    color: '#A9A9A9',
+                    fontSize: textScale(10),
+                    fontFamily: fontFamily.POPPINS_REGULAR,
+                  }}>
+                  Let the exploration begin...
+                </Text>
+                <View
+                  style={{
+                    width: moderateScale(80),
+                    height: moderateScale(80),
+                    borderRadius: moderateScale(40),
+                    top: moderateScale(20),
+                    overflow: 'hidden',
+                  }}>
+                  <Image
+                    style={{
+                      width: moderateScale(80),
+                      height: moderateScale(80),
+                    }}
+                    source={{
+                      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHX9FPBxJWHq5_Id7XkX9Kcx4oYH0jY1NdfA&usqp=CAU',
+                    }}
+                  />
+                </View>
+              </View>
+              <View style={styles.inputContainer}>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.man}
+                    mode="outlined"
+                    label="firstName"
+                    placeholder="firstName"
+                    outlineColor={colors.TRANSPARENT}
+                    activeOutlineColor={colors.TRANSPARENT}
+                    textColor={colors.BLACK}
+                    value={firstName}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setFirstName(e)}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.man}
+                    mode="outlined"
+                    label="lastName"
+                    placeholder="lastName"
+                    outlineColor={colors.TRANSPARENT}
+                    activeOutlineColor={colors.TRANSPARENT}
+                    textColor={colors.BLACK}
+                    value={lastName}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setlastName(e)}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.emaill}
+                    mode="outlined"
+                    label="Email ID"
+                    placeholder="Email ID"
+                    outlineColor={colors.TRANSPARENT}
+                    activeOutlineColor={colors.TRANSPARENT}
+                    textColor={colors.BLACK}
+                    value={email}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setEmail(e)}
+                    keyboardType={'email-address'}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.smartphone}
+                    label="Mobile Number"
+                    placeholder="Mobile Number"
+                    activeOutlineColor={colors.GRAY}
+                    textColor={colors.GRAY}
+                    value={mobile}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setMobile(e)}
+                    outlineColor={colors.GRAY}
+                    mode={'flat'}
+                    keyboardType={'number-pad'}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.lock}
+                    rightIcon={isPasswordVisible ? images.hide : images.show}
+                    onRightIconPress={() => setIsPasswordVisible(prev => !prev)}
+                    label="Password"
+                    placeholder="Password"
+                    activeOutlineColor={colors.GRAY}
+                    textColor={colors.GRAY}
+                    value={password}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setPassword(e)}
+                    outlineColor={colors.GRAY}
+                    mode={'flat'}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.lock}
+                    rightIcon={isPasswordVisible ? images.hide : images.show}
+                    label="Confirm Password"
+                    placeholder="Confirm Password"
+                    activeOutlineColor={colors.GRAY}
+                    textColor={colors.GRAY}
+                    value={confirmPassword}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setConfirmPassword(e)}
+                    outlineColor={colors.GRAY}
+                    onRightIconPress={() => setIsPasswordVisible(prev => !prev)}
+                    mode={'flat'}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.navigation}
+                    label="Address"
+                    placeholder="Address"
+                    activeOutlineColor={colors.GRAY}
+                    textColor={colors.GRAY}
+                    value={address}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setAddress(e)}
+                    outlineColor={colors.GRAY}
+                    mode={'flat'}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.navigation}
+                    label="Locality"
+                    placeholder="Locality"
+                    activeOutlineColor={colors.GRAY}
+                    textColor={colors.GRAY}
+                    value={locality}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setLocality(e)}
+                    outlineColor={colors.GRAY}
+                    mode={'flat'}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.navigation}
+                    label="Area"
+                    placeholder="Area"
+                    activeOutlineColor={colors.GRAY}
+                    textColor={colors.GRAY}
+                    value={area}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setArea(e)}
+                    outlineColor={colors.GRAY}
+                    mode={'flat'}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.navigation}
+                    label="ZipCode"
+                    placeholder="ZipCode"
+                    activeOutlineColor={colors.GRAY}
+                    textColor={colors.GRAY}
+                    value={zipCode}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setZipCode(e)}
+                    outlineColor={colors.GRAY}
+                    keyboardType={'number-pad'}
+                    mode={'flat'}
+                  />
+                </View>
+                <View style={styles.viewStyle}>
+                  <InputField
+                    leftIcon={images.navigation}
+                    label="City"
+                    placeholder="City"
+                    activeOutlineColor={colors.GRAY}
+                    textColor={colors.GRAY}
+                    value={city}
+                    autoCapitalize={'none'}
+                    onChangeText={e => setCity(e)}
+                    outlineColor={colors.GRAY}
+                    mode={'flat'}
+                  />
+                </View>
+              </View>
+
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  bottom: moderateScale(50),
+                }}>
+                <ButtonComp
+                  text="Sign Up"
+                  textStyle={{
+                    color: colors.WHITE,
+                    fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+                  }}
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: colors.REDDISH,
+                    height: moderateScale(45),
+                    width: '90%',
+                  }}
+                  onPress={() => {
+                    checkValidation();
+                  }}
+                />
+                <View style={{flexDirection: 'row', top: moderateScale(10)}}>
+                  <View
+                    style={{
+                      width: '24%',
+                      borderWidth: moderateScale(0.3),
+                      borderColor: '#A9A9A9',
+                      height: 0.3,
+                      top: moderateScale(10),
+                    }}></View>
+                  <View style={{marginHorizontal: moderateScale(10)}}>
+                    <Text
+                      style={{
+                        color: '#A9A9A9',
+                        fontSize: textScale(10),
+                        fontFamily: fontFamily.POPPINS_REGULAR,
+                      }}>
+                      You can also connect with
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: '24%',
+                      borderWidth: moderateScale(0.3),
+                      borderColor: '#A9A9A9',
+                      height: 0.3,
+                      top: moderateScale(10),
+                    }}></View>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    bottom: moderateScale(20),
+                  }}>
+                  <TouchableOpacity
+                    style={{
+                      top: moderateScale(50),
+                      backgroundColor: colors.GRAY,
+                      width: moderateScale(50),
+                      height: moderateScale(50),
+                      borderRadius: moderateScale(25),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginHorizontal: moderateScale(10),
+                    }}>
+                    <Image
+                      source={images.google}
+                      style={{
+                        width: moderateScale(30),
+                        height: moderateScale(30),
+                      }}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={{
+                      top: moderateScale(50),
+                      backgroundColor: colors.GRAY,
+                      width: moderateScale(50),
+                      height: moderateScale(50),
+                      borderRadius: moderateScale(25),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginHorizontal: moderateScale(10),
+                    }}>
+                    <Image
+                      source={images.facebook}
+                      style={{
+                        width: moderateScale(30),
+                        height: moderateScale(30),
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.bottomContainer}>
+                  <Text style={styles.signUpText}>
+                    Already have an account ?
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => navigation.goBack()}>
+                    <Text style={styles.signUpButton}>Sign In!</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
           </View>
         </View>
-      </View>
-    </KeyboardAwareScrollView>
+      </ImageBackground>
+    </View>
   );
 };
 

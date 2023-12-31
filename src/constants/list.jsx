@@ -71,22 +71,66 @@ export const categoriesData = [
 export const popularCarData = [
   {
     id: '1',
-    image: images.cat_1,
+    image: images.yaris,
   },
   {
     id: '2',
-    image: images.cat_1,
+    image: images.yaris,
   },
   {
     id: '3',
-    image: images.cat_1,
+    image: images.yaris,
   },
   {
     id: '4',
-    image: images.cat_1,
+    image: images.yaris,
   },
   {
     id: '5',
-    image: images.cat_1,
+    image: images.yaris,
+  },
+];
+export const topCarData = [
+  {
+    id: '1',
+    image: images.yaris,
+  },
+  {
+    id: '2',
+    image: images.yaris,
+  },
+  {
+    id: '3',
+    image: images.yaris,
+  },
+  {
+    id: '4',
+    image: images.yaris,
+  },
+  {
+    id: '5',
+    image: images.yaris,
+  },
+];
+export const exoticCarData = [
+  {
+    id: '1',
+    image: images.yaris,
+  },
+  {
+    id: '2',
+    image: images.yaris,
+  },
+  {
+    id: '3',
+    image: images.yaris,
+  },
+  {
+    id: '4',
+    image: images.yaris,
+  },
+  {
+    id: '5',
+    image: images.yaris,
   },
 ];

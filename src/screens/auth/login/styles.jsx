@@ -5,6 +5,7 @@ import {
   scale,
 } from '../../../styles/responsiveSize';
 import colors from '../../../constants/colors';
+import fontFamily from '../../../styles/fontFamily';
 
 const styles = StyleSheet.create({
   inputStyle: {
@@ -16,11 +17,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   inputContainer: {
-    flex: 0.8,
+    flex: 0.9,
     backgroundColor: colors.white,
     justifyContent: 'center',
     marginHorizontal: moderateScaleVertical(20),
-    paddingBottom: moderateScale(40),
+    paddingBottom:
+      Platform.OS === 'ios' ? moderateScale(40) : moderateScale(10),
   },
   heading: {
     paddingVertical: moderateScale(30),
@@ -30,7 +32,7 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   inputStyle: {
-    paddingBottom: moderateScaleVertical(30),
+    paddingBottom: moderateScaleVertical(40),
   },
   bottomContainer: {
     backgroundColor: colors.white,
@@ -40,24 +42,33 @@ const styles = StyleSheet.create({
     marginTop: moderateScaleVertical(40),
   },
   signUpText: {
-    fontSize: scale(14),
+    fontSize: scale(10),
+    fontFamily: fontFamily.POPPINS_REGULAR,
+    color: 'black',
   },
   signUpButton: {
-    color: colors.themeColor,
-    fontSize: scale(14),
-    fontWeight: 'bold',
+    fontSize: scale(10),
+    fontFamily: fontFamily.POPPINS_SEMI_BOLD,
+    color: colors.REDDISH,
+    marginStart: moderateScale(4),
   },
   scrollStyle: {
-    marginTop: moderateScaleVertical(220),
-    backgroundColor: colors.white,
-    justifyContent: 'center',
+    backgroundColor: colors.WHITE,
+    flex: 1,
   },
   viewStyle: {
     marginTop: moderateScaleVertical(10),
+    top: moderateScale(40),
   },
   errorText: {
     color: colors.RED,
     marginTop: moderateScale(10),
+  },
+  bottomContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'red',
   },
 });
 export default styles;
