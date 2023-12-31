@@ -11,8 +11,9 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={true} persistor={persistor}>
         <StatusBar
-          backgroundColor={'transparent'}
+          backgroundColor={colors.BLACK}
           translucent={true}
+          hidden={true}
           barStyle="dark-content"
         />
         <RoutesStack />

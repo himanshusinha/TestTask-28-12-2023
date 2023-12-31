@@ -2,7 +2,6 @@ import {View, Image} from 'react-native';
 import React, {useEffect} from 'react';
 import styles from './styles';
 import images from '../../../constants/images';
-import AppStatusBar from '../../../components/statusbar/AppStatusBar';
 import {useNavigation} from '@react-navigation/native';
 import routes from '../../../constants/routes';
 

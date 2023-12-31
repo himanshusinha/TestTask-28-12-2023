@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ImageBackground,
+  BackHandler,
 } from 'react-native';
 import colors from '../../../constants/colors';
 import images from '../../../constants/images';
@@ -34,29 +35,20 @@ const skip = () => {};
 
 const OnboardingScreen = ({navigation}) => {
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      try {
-        let onboardingCompleted = await AsyncStorage.getItem(
-          'onboardingCompleted',
-        );
-
-        console.log('Onboarding status:', onboardingCompleted);
-
-        if (onboardingCompleted === null) {
-          onboardingCompleted = 'false';
-        }
-
-        if (onboardingCompleted === 'true') {
-          navigation.replace(routes.LOGIN_SCREEN);
-        }
-      } catch (error) {
-        console.error('Error checking onboarding status:', error);
-      }
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
     };
 
-    checkOnboardingStatus();
-  }, [navigation]);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
 
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
   const [currentSlideIndex, setCurrentSlideIndex] = React.useState(0);
   const ref = React.useRef();
   const updateCurrentSlideIndex = e => {
@@ -65,22 +57,17 @@ const OnboardingScreen = ({navigation}) => {
     setCurrentSlideIndex(currentIndex);
   };
 
-  const goToNextSlide = async () => {
+  const goToNextSlide = () => {
     const nextSlideIndex = currentSlideIndex + 1;
     if (nextSlideIndex !== onBoardingData.length) {
       const offset = nextSlideIndex * width;
       ref.current.scrollToOffset({offset});
       setCurrentSlideIndex(nextSlideIndex);
     } else {
-      try {
-        await AsyncStorage.setItem('onboardingCompleted', 'true');
-        console.log('Onboarding status set to completed');
-        navigation.replace(routes.LOGIN_SCREEN);
-      } catch (error) {
-        console.error('Error setting onboarding status:', error.message); // Log the error message
-      }
+      navigation.replace(routes.LOGIN_SCREEN);
     }
   };
+
   const Footer = () => {
     return (
       <View

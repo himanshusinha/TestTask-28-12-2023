@@ -7,7 +7,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import InputField from '../../../components/input/InputField';
 import styles from './styles';
 import images from '../../../constants/images';
@@ -16,18 +16,34 @@ import {moderateScale, textScale} from '../../../styles/responsiveSize';
 import ButtonComp from '../../../components/button/ButtonComp';
 import fontFamily from '../../../styles/fontFamily';
 import {useDispatch} from 'react-redux';
-import {loginAsyncThunk} from '../../redux/authAsyncThunk/authAsyncThunk';
 import {useNavigation} from '@react-navigation/native';
 import routes from '../../../constants/routes';
 import {setAuthResponse} from '../../redux/slices/auth.slice';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
+import {BackHandler} from 'react-native';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
   const checkValidation = () => {
     if (email === null || email.trim() === '') {
       Toast.show({
