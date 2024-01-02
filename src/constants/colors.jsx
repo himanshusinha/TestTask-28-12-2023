@@ -7,4 +7,5 @@ export default {
   REDDISH: '#f66366',
   NAVY_BLUE: '#051840',
   GREEN: '#21C50C',
+  YELLOW: '#FFD700',
 };

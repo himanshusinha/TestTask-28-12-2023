@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ImageBackground,
+  BackHandler,
 } from 'react-native';
 import colors from '../../../constants/colors';
 import images from '../../../constants/images';
@@ -15,7 +16,6 @@ import {moderateScale, textScale} from '../../../styles/responsiveSize';
 import {onBoardingData} from '../../../constants/list';
 import fontFamily from '../../../styles/fontFamily';
 import routes from '../../../constants/routes';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ripple from 'react-native-material-ripple';
 
 const {width, height} = Dimensions.get('window');
@@ -33,30 +33,6 @@ const Slide = ({item}) => {
 const skip = () => {};
 
 const OnboardingScreen = ({navigation}) => {
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      try {
-        let onboardingCompleted = await AsyncStorage.getItem(
-          'onboardingCompleted',
-        );
-
-        console.log('Onboarding status:', onboardingCompleted);
-
-        if (onboardingCompleted === null) {
-          onboardingCompleted = 'false';
-        }
-
-        if (onboardingCompleted === 'true') {
-          navigation.replace(routes.LOGIN_SCREEN);
-        }
-      } catch (error) {
-        console.error('Error checking onboarding status:', error);
-      }
-    };
-
-    checkOnboardingStatus();
-  }, [navigation]);
-
   const [currentSlideIndex, setCurrentSlideIndex] = React.useState(0);
   const ref = React.useRef();
   const updateCurrentSlideIndex = e => {
@@ -64,23 +40,32 @@ const OnboardingScreen = ({navigation}) => {
     const currentIndex = Math.round(contentOffsetX / width);
     setCurrentSlideIndex(currentIndex);
   };
+  useEffect(() => {
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    };
 
-  const goToNextSlide = async () => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
+  const goToNextSlide = () => {
     const nextSlideIndex = currentSlideIndex + 1;
     if (nextSlideIndex !== onBoardingData.length) {
       const offset = nextSlideIndex * width;
       ref.current.scrollToOffset({offset});
       setCurrentSlideIndex(nextSlideIndex);
     } else {
-      try {
-        await AsyncStorage.setItem('onboardingCompleted', 'true');
-        console.log('Onboarding status set to completed');
-        navigation.replace(routes.LOGIN_SCREEN);
-      } catch (error) {
-        console.error('Error setting onboarding status:', error.message); // Log the error message
-      }
+      navigation.replace(routes.LOGIN_SCREEN);
     }
   };
+
   const Footer = () => {
     return (
       <View
@@ -192,6 +177,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: moderateScale(23),
     top: moderateScale(30),
+    padding: moderateScale(20),
   },
   title: {
     color: colors.WHITE,

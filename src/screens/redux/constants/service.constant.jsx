@@ -1,6 +1,7 @@
 export const SERVICE_ROUTES = {
   LOGIN: '/user/login',
   SIGN_UP: '/user/signup',
+  GET_ALL_CARS: '/user/getAllCars',
 };
 export const METHODS = {
   GET: 'GET',

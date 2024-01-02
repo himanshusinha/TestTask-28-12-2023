@@ -2,7 +2,6 @@ import {View, Image} from 'react-native';
 import React, {useEffect} from 'react';
 import styles from './styles';
 import images from '../../../constants/images';
-import AppStatusBar from '../../../components/statusbar/AppStatusBar';
 import {useNavigation} from '@react-navigation/native';
 import routes from '../../../constants/routes';
 
@@ -16,11 +15,6 @@ const SplashScreen = () => {
   }, [navigation]);
   return (
     <View style={styles.container}>
-      <AppStatusBar
-        hidden={true}
-        backgroundColor={'white'}
-        barStyle="light-content"
-      />
       <Image source={images.logo} style={styles.logoStyle} />
     </View>
   );

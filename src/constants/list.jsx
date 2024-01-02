@@ -45,48 +45,97 @@ export const categoriesData = [
   {
     id: '1',
     image: images.cat_1,
-    category: 'Suv',
+    category: 'ECONOMY',
   },
   {
     id: '2',
     image: images.cat_2,
-    category: 'Sedan',
+    category: 'SUV',
   },
   {
     id: '3',
     image: images.cat_3,
-    category: 'Compact',
+    category: 'SEDAN',
   },
   {
     id: '4',
     image: images.cat_4,
-    category: 'Hatchback',
+    category: 'COMPACT',
   },
   {
     id: '5',
     image: images.cat_5,
-    category: 'Exotic',
+    category: 'HATCHBACK',
+  },
+  {
+    id: '6',
+    image: images.cat_2,
+    category: 'EXOTIC',
   },
 ];
 export const popularCarData = [
   {
     id: '1',
-    image: images.cat_1,
+    image: images.yaris,
   },
   {
     id: '2',
-    image: images.cat_1,
+    image: images.yaris,
   },
   {
     id: '3',
-    image: images.cat_1,
+    image: images.yaris,
   },
   {
     id: '4',
-    image: images.cat_1,
+    image: images.yaris,
   },
   {
     id: '5',
-    image: images.cat_1,
+    image: images.yaris,
+  },
+];
+export const topCarData = [
+  {
+    id: '1',
+    image: images.yaris,
+  },
+  {
+    id: '2',
+    image: images.yaris,
+  },
+  {
+    id: '3',
+    image: images.yaris,
+  },
+  {
+    id: '4',
+    image: images.yaris,
+  },
+  {
+    id: '5',
+    image: images.yaris,
+  },
+];
+export const exoticCarData = [
+  {
+    id: '1',
+    image: images.yaris,
+  },
+  {
+    id: '2',
+    image: images.yaris,
+  },
+  {
+    id: '3',
+    image: images.yaris,
+  },
+  {
+    id: '4',
+    image: images.yaris,
+  },
+  {
+    id: '5',
+    image: images.yaris,
   },
 ];
