@@ -115,6 +115,7 @@ const HomeScreen = () => {
         />
       </View>
       <KeyboardAwareScrollView
+        bounces={false}
         contentContainerStyle={{paddingBottom: moderateScale(60)}}
         showsVerticalScrollIndicator={false}>
         <FlatList

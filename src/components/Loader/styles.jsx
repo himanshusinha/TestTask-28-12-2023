@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.GRAY_SECONDARY, // Corrected rgba value
+    backgroundColor: 'rgba(0,0,0,0.6)', // Corrected rgba value
   },
 });
 export default styles;
